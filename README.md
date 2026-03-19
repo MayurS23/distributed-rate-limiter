@@ -1,4 +1,4 @@
-# 🔥 Distributed Rate Limiting Service
+#  Distributed Rate Limiting Service
 
 <div align="center">
 
@@ -14,7 +14,7 @@
 
 ---
 
-## 📌 Table of Contents
+##  Table of Contents
 
 - [What is Rate Limiting?](#-what-is-rate-limiting)
 - [What Does This Project Do?](#-what-does-this-project-do)
@@ -39,7 +39,7 @@
 
 ---
 
-## 💡 What is Rate Limiting?
+##  What is Rate Limiting?
 
 Rate limiting is a technique used to control how many requests a client can make to an API within a given time window. Without it:
 
@@ -51,24 +51,24 @@ Rate limiting protects your service by enforcing a maximum request threshold per
 
 ---
 
-## 🎯 What Does This Project Do?
+##  What Does This Project Do?
 
 This service acts as a **middleware layer** that sits in front of your API endpoints and:
 
-- ✅ Identifies each client by **User ID** (authenticated) or **IP address** (unauthenticated)
-- ✅ Tracks how many requests each client has made using a **Token Bucket** stored in Redis
-- ✅ **Allows** requests when tokens are available and forwards them to the backend
-- ✅ **Rejects** requests with `HTTP 429` when the bucket is empty
-- ✅ Supports **per-route limits** (tighter limits on expensive endpoints)
-- ✅ Supports **per-role limits** (higher limits for premium/admin users)
-- ✅ Works across **multiple API instances** using Redis as shared state
-- ✅ Handles **Redis failures** gracefully (fail-open or fail-closed mode)
-- ✅ Exposes a `/metrics` endpoint to monitor rejection rates
-- ✅ Exposes a `/health` endpoint for liveness checks
+-  Identifies each client by **User ID** (authenticated) or **IP address** (unauthenticated)
+-  Tracks how many requests each client has made using a **Token Bucket** stored in Redis
+-  **Allows** requests when tokens are available and forwards them to the backend
+-  **Rejects** requests with `HTTP 429` when the bucket is empty
+-  Supports **per-route limits** (tighter limits on expensive endpoints)
+-  Supports **per-role limits** (higher limits for premium/admin users)
+-  Works across **multiple API instances** using Redis as shared state
+-  Handles **Redis failures** gracefully (fail-open or fail-closed mode)
+-  Exposes a `/metrics` endpoint to monitor rejection rates
+-  Exposes a `/health` endpoint for liveness checks
 
 ---
 
-## 🔄 How It Works
+##  How It Works
 
 Here is the complete request lifecycle:
 
@@ -107,7 +107,7 @@ Here is the complete request lifecycle:
 
 ---
 
-## 🏗️ Architecture
+##  Architecture
 
 ```
                         ┌──────────────────┐
@@ -143,7 +143,7 @@ All API instances share **one Redis** — this ensures consistent rate limiting 
 
 ---
 
-## 🧮 Token Bucket Algorithm
+##  Token Bucket Algorithm
 
 The Token Bucket is the industry-standard algorithm for rate limiting. Here's how it works:
 
@@ -163,17 +163,17 @@ new_tokens     = min(capacity, current_tokens + elapsed_time x refill_rate)
 
 if new_tokens >= 1:
     new_tokens -= 1
-    ALLOW REQUEST ✅
+    ALLOW REQUEST 
 else:
     retry_after = ceil((1 - new_tokens) / refill_rate)
-    REJECT 429 ❌
+    REJECT 429 
 ```
 
 ### Why Token Bucket over other algorithms?
 
 | Algorithm | Burst Handling | Memory | Accuracy | Boundary Spikes |
 |---|---|---|---|---|
-| **Token Bucket** ✅ | Smooth | Low (2 fields) | High | None |
+| **Token Bucket**  | Smooth | Low (2 fields) | High | None |
 | Fixed Window | Hard cutoff | Low | Low | Yes (edge bursts) |
 | Sliding Window Log | Exact | High (log/client) | Perfect | None |
 | Leaky Bucket | No burst | Low | High | None |
@@ -188,13 +188,13 @@ To prevent race conditions when multiple API instances run concurrently, the ent
 Without Lua (WRONG):           With Lua (CORRECT):
   Instance 1 reads tokens=1      Redis executes Lua atomically
   Instance 2 reads tokens=1      Instance 1 and 2 are serialized
-  Instance 1 writes tokens=0     No two instances interleave ✅
+  Instance 1 writes tokens=0     No two instances interleave 
   Instance 2 writes tokens=0  <- BOTH approved! Race condition bug
 ```
 
 ---
 
-## 🛠️ Tech Stack
+##  Tech Stack
 
 | Technology | Version | Purpose |
 |---|---|---|
@@ -209,7 +209,7 @@ Without Lua (WRONG):           With Lua (CORRECT):
 
 ---
 
-## 📁 Project Structure
+##  Project Structure
 
 ```
 distributed-rate-limiter/
@@ -246,7 +246,7 @@ distributed-rate-limiter/
 
 ---
 
-## 📋 Prerequisites
+##  Prerequisites
 
 Before running this project, make sure you have the following installed:
 
@@ -280,7 +280,7 @@ Before running this project, make sure you have the following installed:
 
 ---
 
-## 🚀 Installation & Setup
+##  Installation & Setup
 
 ### Option 1: Docker (Recommended)
 
@@ -410,7 +410,7 @@ Open your browser and go to **http://localhost:8000/docs** — this is the inter
 
 ---
 
-## 📡 API Endpoints
+##  API Endpoints
 
 ### System Endpoints (Not Rate Limited)
 
@@ -432,7 +432,7 @@ Open your browser and go to **http://localhost:8000/docs** — this is the inter
 
 ---
 
-## 🔑 Request Headers
+##  Request Headers
 
 ### Headers You Can Send
 
@@ -452,9 +452,9 @@ Open your browser and go to **http://localhost:8000/docs** — this is the inter
 
 ---
 
-## 📊 Example Requests & Responses
+##  Example Requests & Responses
 
-### 1. Allowed Request ✅
+### 1. Allowed Request 
 
 ```bash
 curl -i http://localhost:8000/api/data \
@@ -469,13 +469,13 @@ X-RateLimit-Remaining: 9.00
 X-RateLimit-Policy: capacity=10;rate=1.0/s
 
 {
-  "message": "Here is your data! 🎉",
+  "message": "Here is your data! ",
   "user": "42",
   "role": "free"
 }
 ```
 
-### 2. Rate Limited Request ❌
+### 2. Rate Limited Request 
 
 After sending more than 10 requests in a short time:
 
@@ -521,7 +521,7 @@ X-RateLimit-Remaining: 9.00
 X-RateLimit-Policy: capacity=10;rate=1.0/s
 
 {
-  "message": "Here is your data! 🎉",
+  "message": "Here is your data! ",
   "user": "anonymous",
   "role": "free"
 }
@@ -566,7 +566,7 @@ curl http://localhost:8000/metrics
 
 ---
 
-## ⚙️ Rate Limit Configuration
+##  Rate Limit Configuration
 
 Limits are resolved in this priority order (highest wins):
 
@@ -601,7 +601,7 @@ All of these are fully configurable in `app/config.py`.
 
 ---
 
-## 🌍 Environment Variables
+##  Environment Variables
 
 Copy `.env.example` to `.env` to configure the service:
 
@@ -618,7 +618,7 @@ Copy `.env.example` to `.env` to configure the service:
 
 ---
 
-## 🧪 Running Tests
+##  Running Tests
 
 The test suite covers token bucket logic, middleware behavior, and metrics. It uses an in-memory fake Redis so **no real Redis is needed** to run tests.
 
@@ -647,7 +647,7 @@ tests/test_rate_limiter.py::TestMetrics::test_rejection_rate                   P
 
 ---
 
-## 📈 How It Scales
+##  How It Scales
 
 ### Horizontal Scaling
 
@@ -677,18 +677,18 @@ All 3 instances read and write to the same Redis bucket state. A request from `u
 
 ---
 
-## 🔥 Fail-Open vs Fail-Closed
+##  Fail-Open vs Fail-Closed
 
 If Redis becomes unavailable, you have two options configured via `FAIL_OPEN`:
 
 | Mode | Setting | Redis Down Behavior | Use When |
 |---|---|---|---|
-| **Fail-Open** | `FAIL_OPEN=true` _(default)_ | ✅ Allow all requests through | Availability is the priority |
-| **Fail-Closed** | `FAIL_OPEN=false` | ❌ Reject all requests with 429 | Security or cost is the priority |
+| **Fail-Open** | `FAIL_OPEN=true` _(default)_ |  Allow all requests through | Availability is the priority |
+| **Fail-Closed** | `FAIL_OPEN=false` |  Reject all requests with 429 | Security or cost is the priority |
 
 ---
 
-## 🧠 Design Decisions & Trade-offs
+##  Design Decisions & Trade-offs
 
 ### Why FastAPI?
 - Native async/await support — handles thousands of concurrent requests without blocking
